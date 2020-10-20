@@ -1,14 +1,17 @@
 const config = require("./config.json");
 const express = require("express");
 const app = express();
-const port = 3000;
+const port = config.port;
 const sqlite3 = require("sqlite3").verbose();
-const db = new sqlite3.Database(config.connectionString);
+
 
 app.get("/:id", (req, res) => {
     const keywords = [];
+    
+    let db = new sqlite3.Database(config.connectionString);
+
     db.each(
-        `SELECT Keyword, CommentText FROM Keywords WHERE SubredditId = ?`,
+        `SELECT Keyword, CommentText FROM Keywords WHERE SubredditId = ? OR SubredditId = 'global'`,
         [req.params.id],
         (err, row) => {
             if (err) {
@@ -24,6 +27,12 @@ app.get("/:id", (req, res) => {
             res.send(keywords.map((keyword) => `<p>${keyword.Keyword} -> ${keyword.CommentText}</p>`).join(" "));
         }
     );
+
+    db.close((err) => {
+        if (err) {
+            console.error(err.message);
+        }
+    })
 });
 
 app.listen(port, () => {

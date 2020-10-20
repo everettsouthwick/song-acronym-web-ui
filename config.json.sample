@@ -1,3 +1,4 @@
 {
-    "connectionString": "main.db"
+    "connectionString": "main.db",
+    "port": 3001
 }
